@@ -5,54 +5,38 @@ import { pusherServer } from "@/app/libs/pusher";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { conversationId: string } }
+  context: any          // ← leave it untyped
 ) {
   try {
-    const currentUser = await getCurrentUser();
+    // safely cast just where you need it
+    const { conversationId } =
+      (context as { params: { conversationId: string } }).params;
 
+    const currentUser = await getCurrentUser();
     if (!currentUser?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const conversation = await prisma.conversation.findUnique({
-      where: {
-        id: params.conversationId,
-      },
+      where: { id: conversationId },
       include: {
-        messages: {
-          include: {
-            seen: true,
-          },
-        },
+        messages: { include: { seen: true } },
         users: true,
       },
     });
-
     if (!conversation) {
       return new NextResponse("Invalid ID", { status: 400 });
     }
 
-    const lastMessage = conversation.messages[conversation.messages.length - 1];
-
+    const lastMessage = conversation.messages.at(-1);
     if (!lastMessage) {
       return NextResponse.json(conversation);
     }
 
     const updatedMessage = await prisma.message.update({
-      where: {
-        id: lastMessage.id,
-      },
-      include: {
-        seen: true,
-        sender: true,
-      },
-      data: {
-        seen: {
-          connect: {
-            id: currentUser.id,
-          },
-        },
-      },
+      where: { id: lastMessage.id },
+      include: { seen: true, sender: true },
+      data: { seen: { connect: { id: currentUser.id } } },
     });
 
     conversation.users.forEach((user) => {
@@ -62,8 +46,8 @@ export async function POST(
     });
 
     return NextResponse.json(updatedMessage);
-  } catch (error) {
-    console.error("SEEN_ROUTE_ERROR", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+  } catch (err) {
+    console.error("SEEN_ROUTE_ERROR", err);
+    return new NextResponse("Internal Error", { status: 500 });
   }
 }
