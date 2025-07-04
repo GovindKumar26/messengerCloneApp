@@ -618,12 +618,11 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
 
     return (
         <>
-            <ConfirmModal
-                isOpen={confirmOpen}
-                onClose={() => setConfirmOpen(false)}
-            >
-            
-            </ConfirmModal>
+           <ConfirmModal
+  isOpen={confirmOpen}
+  onClose={() => setConfirmOpen(false)}
+/>
+
 
             <Transition show={isOpen} as={Fragment}>
                 <Dialog as='div' className='relative z-50' onClose={onClose}>
