@@ -90,12 +90,12 @@ import prisma from "@/app/libs/prismadb";
 import { NextResponse } from "next/server";
 
 export async function POST(
-  req: Request,
-  { params }: { params: { conversationId: string } }
+  request: Request,
+  context: { params: { conversationId: string } }
 ) {
   try {
     const currentUser = await getCurrentUser();
-    const { conversationId } = params;
+    const conversationId = context.params.conversationId;
 
     if (!currentUser?.id || !currentUser?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
