@@ -84,33 +84,27 @@
 //         return new NextResponse("Internal Error", {status: 500})
 //     }
 // }
-
+import { NextRequest, NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
-import { NextResponse } from "next/server";
+import { pusherServer } from "@/app/libs/pusher";
 
 export async function POST(
-  request: Request,
-  context: { params: { conversationId: string } }
+  request: NextRequest,                       // ✅ first arg: NextRequest
+  { params }: { params: { conversationId: string } }   // ✅ second arg: inline params object
 ) {
   try {
     const currentUser = await getCurrentUser();
-    const conversationId = context.params.conversationId;
-
-    if (!currentUser?.id || !currentUser?.email) {
+    if (!currentUser?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const { conversationId } = params;
+
     const conversation = await prisma.conversation.findUnique({
-      where: {
-        id: conversationId,
-      },
+      where: { id: conversationId },
       include: {
-        messages: {
-          include: {
-            seen: true,
-          },
-        },
+        messages: { include: { seen: true } },
         users: true,
       },
     });
@@ -119,32 +113,29 @@ export async function POST(
       return new NextResponse("Invalid ID", { status: 400 });
     }
 
-    const lastMessage = conversation.messages[conversation.messages.length - 1];
-
+    const lastMessage = conversation.messages.at(-1);
     if (!lastMessage) {
       return NextResponse.json(conversation);
     }
 
-    const updatedMessage = await prisma.message.update({
-      where: {
-        id: lastMessage.id,
-      },
-      include: {
-        seen: true,
-        sender: true,
-      },
+    const updated = await prisma.message.update({
+      where: { id: lastMessage.id },
+      include: { seen: true, sender: true },
       data: {
-        seen: {
-          connect: {
-            id: currentUser.id,
-          },
-        },
+        seen: { connect: { id: currentUser.id } },
       },
     });
 
-    return NextResponse.json(updatedMessage);
-  } catch (error) {
-    console.error("ERROR_CONVERSATION_SEEN", error);
+    // optional real‑time trigger
+    conversation.users.forEach((user) => {
+      if (user.email) {
+        pusherServer.trigger(user.email, "conversation:update", updated);
+      }
+    });
+
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error("ERROR_CONVERSATION_SEEN", err);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
