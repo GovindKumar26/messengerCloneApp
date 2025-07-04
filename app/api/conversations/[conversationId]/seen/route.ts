@@ -5,10 +5,9 @@ import { pusherServer } from "@/app/libs/pusher";
 
 export async function POST(
   req: NextRequest,
-  context: { params: { conversationId: string } }
+  { params }: { params: { conversationId: string } }
 ) {
   try {
-    const { conversationId } = context.params;
     const currentUser = await getCurrentUser();
 
     if (!currentUser?.id) {
@@ -16,7 +15,9 @@ export async function POST(
     }
 
     const conversation = await prisma.conversation.findUnique({
-      where: { id: conversationId },
+      where: {
+        id: params.conversationId,
+      },
       include: {
         messages: {
           include: {
@@ -32,6 +33,7 @@ export async function POST(
     }
 
     const lastMessage = conversation.messages[conversation.messages.length - 1];
+
     if (!lastMessage) {
       return NextResponse.json(conversation);
     }
@@ -53,7 +55,6 @@ export async function POST(
       },
     });
 
-    // Push real-time update to all users
     conversation.users.forEach((user) => {
       if (user.email) {
         pusherServer.trigger(user.email, "conversation:update", updatedMessage);
@@ -62,7 +63,7 @@ export async function POST(
 
     return NextResponse.json(updatedMessage);
   } catch (error) {
-    console.error("ERROR_SEEN", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("SEEN_ROUTE_ERROR", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
