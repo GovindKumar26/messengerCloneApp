@@ -28,7 +28,7 @@
 
 
 import prisma from '@/app/libs/prismadb'
-import SuperJSON from "superjson"
+
 
 const getMessages = async (conversationId: string) => {
     try {

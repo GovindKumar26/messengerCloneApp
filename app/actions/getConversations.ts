@@ -41,7 +41,7 @@
 
 import prisma from "@/app/libs/prismadb"
 import getCurrentUser from "./getCurrentUser"
-import SuperJSON from "superjson"
+
 
 const getConversations = async () => {
     const currentUser = await getCurrentUser();

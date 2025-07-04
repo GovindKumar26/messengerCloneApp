@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { FullMessageType } from "@/app/types";
 import clsx from "clsx";
 import Avatar from "@/app/components/Avatar";
-import { format, fromUnixTime } from "date-fns";
+import { format } from "date-fns";
 import Image from 'next/image'
 import { useState } from "react";
 import ImageModal from "./ImageModal";

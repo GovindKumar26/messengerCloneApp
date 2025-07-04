@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { useParams, usePathname } from "next/navigation";
+import {  usePathname } from "next/navigation";
 import { HiChat } from "react-icons/hi";
-import { HiArrowLeftOnRectangle, HiMiniUsers } from "react-icons/hi2";
+import { HiArrowLeftOnRectangle } from "react-icons/hi2";
 import { HiUsers } from "react-icons/hi"
 import { signOut } from "next-auth/react";
 
 import useConversation from "./useConversation";
-import DesktopSidebar from "../components/sidebar/DesktopSidebar";
+
 
 const useRoutes = ()=> {
     const pathname = usePathname();

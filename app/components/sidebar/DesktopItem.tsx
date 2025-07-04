@@ -2,7 +2,7 @@
 import clsx from 'clsx'
 import Link from 'next/link'
 import React from 'react';
-import SuperJSON from "superjson";
+
 
 interface DesktopItemProps {
     label: string;

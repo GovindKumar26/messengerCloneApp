@@ -579,7 +579,6 @@ import { format } from 'date-fns';
 import { Transition, Dialog, DialogPanel, TransitionChild } from '@headlessui/react'
 import { IoClose, IoTrash } from 'react-icons/io5'
 import Avatar from '@/app/components/Avatar';
-import Modal from '@/app/components/Modal'
 import ConfirmModal from './ConfirmModal';
 import AvatarGroup from '@/app/components/AvatarGroup';
 import useActiveList from '@/app/hooks/useActiveList';

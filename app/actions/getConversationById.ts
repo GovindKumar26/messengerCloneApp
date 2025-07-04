@@ -32,7 +32,7 @@
 
 import prisma from '@/app/libs/prismadb'
 import getCurrentUser from './getCurrentUser'
-import SuperJSON from "superjson"
+
 
 const getConversationById = async (conversationId: string) => {
     try {
