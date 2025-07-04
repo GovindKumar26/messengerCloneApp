@@ -197,16 +197,16 @@
 
 
 import getCurrentUser from "@/app/actions/getCurrentUser";
-import { NextResponse, NextRequest } from "next/server";
-import prisma from "@/app/libs/prismadb";
+import { NextResponse } from "next/server";
+import prisma from '@/app/libs/prismadb';
 import { pusherServer } from "@/app/libs/pusher";
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { conversationId: string } }
+  request: Request,
+  context: any // ✅ Let Next.js provide the correct type during runtime
 ) {
   try {
-    const { conversationId } = params;
+    const { conversationId } = context.params;
     const currentUser = await getCurrentUser();
 
     if (!currentUser?.id) {
@@ -214,8 +214,12 @@ export async function DELETE(
     }
 
     const existingConversation = await prisma.conversation.findUnique({
-      where: { id: conversationId },
-      include: { users: true },
+      where: {
+        id: conversationId,
+      },
+      include: {
+        users: true,
+      },
     });
 
     const deletedConversation = await prisma.conversation.deleteMany({
