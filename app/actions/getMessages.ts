@@ -44,7 +44,8 @@ const getMessages = async (conversationId: string) => {
         // Serialize messages with SuperJSON to handle Dates
         return messages
         
-    } catch (error: any) {
+    } catch (error: unknown) {
+         console.error("Failed to fetch messages", error);
         return [] // Serialize empty array for consistency
     }
 }

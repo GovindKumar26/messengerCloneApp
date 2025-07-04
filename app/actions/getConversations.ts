@@ -66,7 +66,8 @@ const getConversations = async () => {
         });
 
         return conversations;
-    } catch (error: any) {
+    } catch (error: unknown) {
+         console.error("Failed to fetch conversations", error);
         return []
     }
 };

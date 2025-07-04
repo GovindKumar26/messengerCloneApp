@@ -46,7 +46,8 @@ const getUsers = async () => {
 
         return users; // Return raw data, NOT SuperJSON.stringify()
         
-    } catch (error: any) {
+    } catch (error: unknown) {
+         console.error("Failed to fetch users", error);
         return [];
     }
 }

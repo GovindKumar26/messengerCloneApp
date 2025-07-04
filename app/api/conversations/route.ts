@@ -245,7 +245,8 @@ export async function POST(request: Request) {
 
         return NextResponse.json(SuperJSON.stringify(newConversation));
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+         console.error("Failed ", error);
         return new NextResponse('Internal Error', { status: 500 });
     }
 }

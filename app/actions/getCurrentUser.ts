@@ -53,7 +53,8 @@ const getCurrentUser = async () => {
 
         return currentUser; // Do NOT serialize here
 
-    } catch (error: any) {
+    } catch (error: unknown) { 
+        console.error("Failed to fetch current user", error);
         return null;
     }
 }
